@@ -1,0 +1,157 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+
+.pageTitle {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-xs);
+}
+
+.subtitle {
+  color: var(--color-text-secondary);
+  font-size: 1.1rem;
+}
+
+.card {
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-xl);
+  box-shadow: var(--shadow-sm);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xl);
+}
+
+.sectionTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-md);
+}
+
+.charityGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-md);
+}
+
+@media (min-width: 768px) {
+  .charityGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.charityCard {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  display: flex;
+  gap: var(--space-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.charityCard:hover {
+  border-color: var(--color-primary-light);
+  background-color: var(--color-bg-surface-elevated);
+}
+
+.charityCard.selected {
+  border-color: var(--color-accent);
+  background-color: rgba(16, 185, 129, 0.05); /* very light emerald */
+}
+
+.radioWrapper {
+  padding-top: var(--space-xs);
+}
+
+.radio {
+  accent-color: var(--color-accent);
+  width: 1.25rem;
+  height: 1.25rem;
+  cursor: pointer;
+}
+
+.charityName {
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-xs);
+}
+
+.charityDesc {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+}
+
+.helpText {
+  color: var(--color-text-secondary);
+  font-size: 0.95rem;
+  margin-bottom: var(--space-lg);
+}
+
+.sliderGroup {
+  max-width: 500px;
+}
+
+.sliderHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-md);
+}
+
+.label {
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
+.percentageValue {
+  font-weight: 700;
+  font-size: 1.5rem;
+  color: var(--color-accent);
+}
+
+.slider {
+  width: 100%;
+  accent-color: var(--color-accent);
+  height: 8px;
+  border-radius: var(--radius-full);
+  outline: none;
+}
+
+.sliderLabels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: var(--space-sm);
+  font-size: 0.875rem;
+  color: var(--color-text-tertiary);
+}
+
+.actions {
+  border-top: 1px solid var(--color-border);
+  padding-top: var(--space-xl);
+  display: flex;
+  justify-content: flex-end;
+}
+
+.submitBtn {
+  background-color: var(--color-primary);
+  color: white;
+  padding: var(--space-md) var(--space-xl);
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  transition: background-color var(--transition-fast);
+}
+
+.submitBtn:hover {
+  background-color: var(--color-primary-light);
+}
