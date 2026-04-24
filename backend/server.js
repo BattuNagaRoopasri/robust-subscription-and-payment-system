@@ -38,6 +38,11 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', message: 'Backend is running' });
 });
 
+// Root route for Vercel
+app.get('/', (req, res) => {
+  res.send('ImpactGolf Backend API is running!');
+});
+
 const Score = require('./models/Score');
 
 // Auth Middleware
@@ -519,6 +524,11 @@ app.post('/api/subscription/cancel', authenticateToken, async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`Backend server running on http://localhost:${PORT}`);
-});
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(PORT, () => {
+    console.log(`Backend server running on http://localhost:${PORT}`);
+  });
+}
+
+// Export the app for Vercel serverless deployment
+module.exports = app;
