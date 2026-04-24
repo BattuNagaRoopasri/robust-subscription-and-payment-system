@@ -4,6 +4,8 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 const User = require('./models/User');
+const Charity = require('./models/Charity');
+const Draw = require('./models/Draw');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -219,10 +221,158 @@ app.put('/api/admin/verifications/:id', authenticateToken, requireAdmin, async (
   }
 });
 
-// Mock charity update route
-app.post('/api/charity', (req, res) => {
-  const { charityId, percentage } = req.body;
-  res.json({ status: 'success', message: 'Charity updated' });
+// --- Admin: Stats ---
+app.get('/api/admin/stats', authenticateToken, requireAdmin, async (req, res) => {
+  try {
+    const totalUsers = await User.countDocuments();
+    const activeSubs = await User.countDocuments({ subscriptionStatus: 'active' });
+    
+    // Assume $10/month, 50% prize, 30% charity
+    const totalRevenue = activeSubs * 10;
+    const prizePool = totalRevenue * 0.50;
+    const charityPool = totalRevenue * 0.30;
+    
+    res.json({
+      status: 'success',
+      data: {
+        totalUsers,
+        activeSubscriptions: activeSubs,
+        totalPrizePool: prizePool,
+        charityContributions: charityPool
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ status: 'error', message: error.message });
+  }
+});
+
+// --- Admin: Users ---
+app.get('/api/admin/users', authenticateToken, requireAdmin, async (req, res) => {
+  try {
+    const users = await User.find().select('-password');
+    res.json({ status: 'success', data: users });
+  } catch (error) {
+    res.status(500).json({ status: 'error', message: error.message });
+  }
+});
+
+app.put('/api/admin/users/:id', authenticateToken, requireAdmin, async (req, res) => {
+  try {
+    const { role, subscriptionStatus } = req.body;
+    const updateData = {};
+    if (role) updateData.role = role;
+    if (subscriptionStatus) updateData.subscriptionStatus = subscriptionStatus;
+    
+    const user = await User.findByIdAndUpdate(req.params.id, updateData, { new: true }).select('-password');
+    res.json({ status: 'success', data: user });
+  } catch (error) {
+    res.status(500).json({ status: 'error', message: error.message });
+  }
+});
+
+// --- Admin: Charities ---
+app.get('/api/admin/charities', authenticateToken, requireAdmin, async (req, res) => {
+  try {
+    const charities = await Charity.find();
+    res.json({ status: 'success', data: charities });
+  } catch (error) {
+    res.status(500).json({ status: 'error', message: error.message });
+  }
+});
+
+app.post('/api/admin/charities', authenticateToken, requireAdmin, async (req, res) => {
+  try {
+    const charity = new Charity(req.body);
+    await charity.save();
+    res.json({ status: 'success', data: charity });
+  } catch (error) {
+    res.status(500).json({ status: 'error', message: error.message });
+  }
+});
+
+app.put('/api/admin/charities/:id', authenticateToken, requireAdmin, async (req, res) => {
+  try {
+    const charity = await Charity.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    res.json({ status: 'success', data: charity });
+  } catch (error) {
+    res.status(500).json({ status: 'error', message: error.message });
+  }
+});
+
+app.delete('/api/admin/charities/:id', authenticateToken, requireAdmin, async (req, res) => {
+  try {
+    await Charity.findByIdAndDelete(req.params.id);
+    res.json({ status: 'success', message: 'Charity deleted' });
+  } catch (error) {
+    res.status(500).json({ status: 'error', message: error.message });
+  }
+});
+
+// Public charities endpoint for users
+app.get('/api/charities', async (req, res) => {
+  try {
+    const charities = await Charity.find({ status: 'Active' });
+    res.json({ status: 'success', data: charities });
+  } catch (error) {
+    res.status(500).json({ status: 'error', message: error.message });
+  }
+});
+
+// --- Admin: Draws ---
+app.get('/api/admin/draws', authenticateToken, requireAdmin, async (req, res) => {
+  try {
+    const draws = await Draw.find().populate('winners.user', 'username email').sort({ createdAt: -1 });
+    res.json({ status: 'success', data: draws });
+  } catch (error) {
+    res.status(500).json({ status: 'error', message: error.message });
+  }
+});
+
+app.post('/api/admin/draws/simulate', authenticateToken, requireAdmin, async (req, res) => {
+  try {
+    // Simple mock logic for simulation: pick up to 2 random active users
+    const users = await User.find({ subscriptionStatus: 'active' });
+    if (users.length === 0) {
+      return res.json({ status: 'success', data: [] });
+    }
+    
+    // Pick randomly
+    const shuffled = users.sort(() => 0.5 - Math.random());
+    const selected = shuffled.slice(0, Math.min(2, users.length));
+    
+    const winners = selected.map(u => ({
+      user: { _id: u._id, username: u.username, email: u.email },
+      prizeAmount: 500, // mock amount
+      matchType: '4-Number Match'
+    }));
+    
+    res.json({ status: 'success', data: winners });
+  } catch (error) {
+    res.status(500).json({ status: 'error', message: error.message });
+  }
+});
+
+app.post('/api/admin/draws/publish', authenticateToken, requireAdmin, async (req, res) => {
+  const { month, winners } = req.body;
+  try {
+    // Note: in a real system we'd map the winner user IDs properly
+    const dbWinners = winners.map(w => ({
+      user: w.user._id,
+      prizeAmount: w.prizeAmount,
+      matchType: w.matchType
+    }));
+    
+    const draw = new Draw({
+      month,
+      winners: dbWinners,
+      status: 'Published'
+    });
+    await draw.save();
+    
+    res.json({ status: 'success', data: draw });
+  } catch (error) {
+    res.status(500).json({ status: 'error', message: error.message });
+  }
 });
 
 // Signup route
@@ -239,7 +389,7 @@ app.post('/api/auth/signup', async (req, res) => {
       password, 
       username: username || email.split('@')[0],
       selectedCharity: selectedCharity || '1',
-      role: email === 'test2@example.com' ? 'admin' : 'user'
+      role: email === 'roopa12@gmail.com' ? 'admin' : 'user'
     });
     await user.save();
     
@@ -265,7 +415,7 @@ app.post('/api/auth/login', async (req, res) => {
     }
 
     // Auto-upgrade test user to admin for development
-    if (email === 'test2@example.com' && user.role !== 'admin') {
+    if (email === 'roopa12@gmail.com' && user.role !== 'admin') {
       user.role = 'admin';
       await user.save();
     }

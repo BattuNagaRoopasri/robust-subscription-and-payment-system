@@ -1,19 +1,66 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styles from '../page.module.css';
+import { fetchAdminDraws, simulateAdminDraw, publishAdminDraw } from '../actions';
 
 export default function AdminDrawsPage() {
   const [drawLogic, setDrawLogic] = useState('random');
-  const [simulated, setSimulated] = useState(false);
+  const [simulatedWinners, setSimulatedWinners] = useState<any[] | null>(null);
+  const [isPublishing, setIsPublishing] = useState(false);
+  const [drawHistory, setDrawHistory] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const runSimulation = () => {
-    alert(`Running ${drawLogic} draw simulation...`);
-    setTimeout(() => setSimulated(true), 1000);
+  useEffect(() => {
+    loadDraws();
+  }, []);
+
+  const loadDraws = async () => {
+    try {
+      const res = await fetchAdminDraws();
+      if (res.status === 'success') {
+        setDrawHistory(res.data);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const publishResults = () => {
-    alert('Draw results published! Winners have been notified.');
-    setSimulated(false);
+  const runSimulation = async () => {
+    setSimulatedWinners(null);
+    try {
+      const res = await simulateAdminDraw();
+      if (res.status === 'success') {
+        setSimulatedWinners(res.data);
+      } else {
+        alert('Simulation failed.');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Error running simulation.');
+    }
+  };
+
+  const publishResults = async () => {
+    if (!simulatedWinners) return;
+    setIsPublishing(true);
+    try {
+      const month = new Date().toLocaleString('default', { month: 'long', year: 'numeric' });
+      const res = await publishAdminDraw(month, simulatedWinners);
+      if (res.status === 'success') {
+        alert('Draw results published! Winners have been notified.');
+        setSimulatedWinners(null);
+        loadDraws();
+      } else {
+        alert('Failed to publish results.');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Error publishing results.');
+    } finally {
+      setIsPublishing(false);
+    }
   };
 
   return (
@@ -46,32 +93,64 @@ export default function AdminDrawsPage() {
             </button>
             <button 
               onClick={publishResults}
-              disabled={!simulated}
-              style={{ flex: 1, padding: '0.8rem', backgroundColor: simulated ? 'var(--color-primary)' : 'var(--color-bg-base)', border: 'none', borderRadius: '4px', cursor: simulated ? 'pointer' : 'not-allowed', color: simulated ? 'white' : 'var(--color-text-secondary)', fontWeight: 600, opacity: simulated ? 1 : 0.5 }}
+              disabled={!simulatedWinners || isPublishing}
+              style={{ flex: 1, padding: '0.8rem', backgroundColor: (simulatedWinners && !isPublishing) ? 'var(--color-primary)' : 'var(--color-bg-base)', border: 'none', borderRadius: '4px', cursor: (simulatedWinners && !isPublishing) ? 'pointer' : 'not-allowed', color: (simulatedWinners && !isPublishing) ? 'white' : 'var(--color-text-secondary)', fontWeight: 600, opacity: (simulatedWinners && !isPublishing) ? 1 : 0.5 }}
             >
-              Publish Results
+              {isPublishing ? 'Publishing...' : 'Publish Results'}
             </button>
           </div>
         </div>
       </div>
 
-      {simulated && (
-        <div className={styles.chartSection} style={{ borderLeft: '4px solid #10b981' }}>
+      {simulatedWinners && (
+        <div className={styles.chartSection} style={{ borderLeft: '4px solid #10b981', marginBottom: '2rem' }}>
           <h2 className={styles.sectionTitle}>Simulation Results</h2>
           <p style={{ color: 'var(--color-text-secondary)', marginBottom: '1rem' }}>These results are strictly for preview and have not been published.</p>
           
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            <div style={{ padding: '1rem', backgroundColor: 'var(--color-bg-base)', borderRadius: '4px', border: '1px solid var(--color-border)' }}>
-              <h3 style={{ color: 'var(--color-text-primary)', marginBottom: '0.5rem' }}>5-Number Match (Jackpot)</h3>
-              <p style={{ color: 'var(--color-text-secondary)' }}>No Winners. Rolling over to next month.</p>
-            </div>
-            <div style={{ padding: '1rem', backgroundColor: 'var(--color-bg-base)', borderRadius: '4px', border: '1px solid var(--color-border)' }}>
-              <h3 style={{ color: 'var(--color-text-primary)', marginBottom: '0.5rem' }}>4-Number Match</h3>
-              <p style={{ color: 'var(--color-text-secondary)' }}>2 Winners - Jane Smith, Bob Wilson</p>
-            </div>
+            {simulatedWinners.length === 0 ? (
+              <p>No winners drawn (possibly no active users).</p>
+            ) : (
+              simulatedWinners.map((winner, index) => (
+                <div key={index} style={{ padding: '1rem', backgroundColor: 'var(--color-bg-base)', borderRadius: '4px', border: '1px solid var(--color-border)' }}>
+                  <h3 style={{ color: 'var(--color-text-primary)', marginBottom: '0.5rem' }}>{winner.matchType}</h3>
+                  <p style={{ color: 'var(--color-text-secondary)' }}>Winner: {winner.user.username} ({winner.user.email}) - Prize: ${winner.prizeAmount}</p>
+                </div>
+              ))
+            )}
           </div>
         </div>
       )}
+
+      <div className={styles.chartSection}>
+        <h2 className={styles.sectionTitle}>Draw History</h2>
+        {loading ? (
+          <p>Loading history...</p>
+        ) : drawHistory.length === 0 ? (
+          <p>No published draws yet.</p>
+        ) : (
+          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+            <thead>
+              <tr style={{ borderBottom: '2px solid var(--color-border)' }}>
+                <th style={{ padding: '1rem' }}>Month</th>
+                <th style={{ padding: '1rem' }}>Date Executed</th>
+                <th style={{ padding: '1rem' }}>Total Winners</th>
+                <th style={{ padding: '1rem' }}>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {drawHistory.map(draw => (
+                <tr key={draw._id} style={{ borderBottom: '1px solid var(--color-border)' }}>
+                  <td style={{ padding: '1rem', fontWeight: 600 }}>{draw.month}</td>
+                  <td style={{ padding: '1rem', color: 'var(--color-text-secondary)' }}>{new Date(draw.dateExecuted).toLocaleString()}</td>
+                  <td style={{ padding: '1rem' }}>{draw.winners.length}</td>
+                  <td style={{ padding: '1rem' }}><span style={{ color: '#10b981', fontWeight: 600 }}>{draw.status}</span></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
     </div>
   );
 }
