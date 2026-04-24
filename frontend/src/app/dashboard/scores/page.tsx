@@ -1,21 +1,27 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styles from './page.module.css';
-
-// Mock data for demonstration purposes without Supabase connection
-const MOCK_SCORES = [
-  { id: '1', date: '2023-10-15', score: 36 },
-  { id: '2', date: '2023-10-12', score: 32 },
-  { id: '3', date: '2023-10-05', score: 41 },
-];
+import { fetchScores, addScore, deleteScore } from './actions';
 
 export default function ScoresPage() {
-  const [scores, setScores] = useState(MOCK_SCORES);
+  const [scores, setScores] = useState<any[]>([]);
   const [newScore, setNewScore] = useState('');
   const [newDate, setNewDate] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(true);
 
-  const handleAddScore = (e: React.FormEvent) => {
+  useEffect(() => {
+    loadScores();
+  }, []);
+
+  const loadScores = async () => {
+    setLoading(true);
+    const data = await fetchScores();
+    setScores(data);
+    setLoading(false);
+  };
+
+  const handleAddScore = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
@@ -25,32 +31,25 @@ export default function ScoresPage() {
       return;
     }
 
-    if (scores.some(s => s.date === newDate)) {
-      setError('A score for this date already exists.');
+    const result = await addScore(newDate, scoreNum);
+    
+    if (result.status === 'error') {
+      setError(result.message);
       return;
     }
 
-    const newScoreObj = {
-      id: Math.random().toString(),
-      date: newDate,
-      score: scoreNum,
-    };
-
-    const updatedScores = [...scores, newScoreObj]
-      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-
-    // Keep only the latest 5 scores (oldest is replaced if > 5)
-    if (updatedScores.length > 5) {
-      updatedScores.length = 5;
-    }
-
-    setScores(updatedScores);
     setNewScore('');
     setNewDate('');
+    await loadScores();
   };
 
-  const handleDelete = (id: string) => {
-    setScores(scores.filter(s => s.id !== id));
+  const handleDelete = async (id: string) => {
+    const result = await deleteScore(id);
+    if (result.status === 'error') {
+      setError(result.message);
+    } else {
+      await loadScores();
+    }
   };
 
   return (
@@ -100,7 +99,9 @@ export default function ScoresPage() {
           <span className={styles.badge}>{scores.length} / 5</span>
         </div>
         
-        {scores.length === 0 ? (
+        {loading ? (
+          <p className={styles.emptyState}>Loading scores...</p>
+        ) : scores.length === 0 ? (
           <p className={styles.emptyState}>No scores logged yet.</p>
         ) : (
           <div className={styles.tableWrapper}>
@@ -114,11 +115,11 @@ export default function ScoresPage() {
               </thead>
               <tbody>
                 {scores.map((score) => (
-                  <tr key={score.id}>
+                  <tr key={score._id}>
                     <td>{new Date(score.date).toLocaleDateString()}</td>
                     <td className={styles.scoreValue}>{score.score}</td>
                     <td className={styles.actionsCell}>
-                      <button onClick={() => handleDelete(score.id)} className={styles.deleteBtn}>Delete</button>
+                      <button onClick={() => handleDelete(score._id)} className={styles.deleteBtn}>Delete</button>
                     </td>
                   </tr>
                 ))}

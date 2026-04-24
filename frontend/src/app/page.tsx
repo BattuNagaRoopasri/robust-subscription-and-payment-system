@@ -57,6 +57,34 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      <section className={styles.spotlight}>
+        <div className={styles.spotlightContainer}>
+          <div className={styles.spotlightHeader}>
+            <h2 className={styles.spotlightTitle}>Featured Charity Spotlight</h2>
+            <p className={styles.subtitle}>See the direct impact of your contributions.</p>
+          </div>
+          
+          <div className={styles.spotlightCard}>
+            <div className={styles.spotlightImage}></div>
+            <div className={styles.spotlightContent}>
+              <span className={styles.spotlightTag}>Charity of the Month</span>
+              <h3 className={styles.spotlightCharityName}>First Tee Foundation</h3>
+              <p className={styles.spotlightDesc}>
+                Impacting the lives of young people by providing educational programs that build character, instill life-enhancing values and promote healthy choices through the game of golf. 
+              </p>
+              <div style={{ display: 'flex', gap: '1rem' }}>
+                <Link href="/charities" className={styles.primaryBtn}>
+                  Donate Directly
+                </Link>
+                <Link href="/charities" className={styles.secondaryBtn}>
+                  View All Charities
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
     </>
   );
 }

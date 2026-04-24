@@ -126,3 +126,84 @@
   font-size: 0.95rem;
   line-height: 1.6;
 }
+
+/* Spotlight Section */
+.spotlight {
+  padding: var(--space-3xl) 0;
+  background-color: var(--color-bg-base);
+  border-top: 1px solid var(--color-border);
+}
+
+.spotlightContainer {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 var(--space-md);
+}
+
+.spotlightHeader {
+  text-align: center;
+  margin-bottom: var(--space-2xl);
+}
+
+.spotlightTitle {
+  font-size: clamp(2rem, 4vw, 2.5rem);
+  font-weight: 800;
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-sm);
+}
+
+.spotlightCard {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-bg-surface);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-lg);
+}
+
+@media (min-width: 768px) {
+  .spotlightCard {
+    flex-direction: row;
+  }
+}
+
+.spotlightImage {
+  flex: 1;
+  background-color: var(--color-border);
+  min-height: 300px;
+  background-image: url('https://loremflickr.com/800/600/golf,course,kids/all');
+  background-size: cover;
+  background-position: center;
+}
+
+.spotlightContent {
+  flex: 1;
+  padding: var(--space-2xl);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.spotlightTag {
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  letter-spacing: 1px;
+  margin-bottom: var(--space-sm);
+}
+
+.spotlightCharityName {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-md);
+}
+
+.spotlightDesc {
+  color: var(--color-text-secondary);
+  line-height: 1.7;
+  font-size: 1.1rem;
+  margin-bottom: var(--space-xl);
+}

@@ -21,8 +21,8 @@ export default async function DashboardLayout({
           <Link href="/dashboard" className={styles.navLink}>Overview</Link>
           <Link href="/dashboard/scores" className={styles.navLink}>My Scores</Link>
           <Link href="/dashboard/charity" className={styles.navLink}>My Charity</Link>
-          <Link href="/dashboard/winnings" className={styles.navLink}>Winnings</Link>
-          <Link href="/dashboard/settings" className={styles.navLink}>Settings</Link>
+          <Link href="/dashboard/winnings" className={styles.navLink}>Winnings & Verification</Link>
+          <Link href="/subscribe" className={styles.navLink}>Subscription</Link>
         </nav>
       </aside>
       <main className={styles.mainContent}>

@@ -19,6 +19,16 @@ export default function LoginPage() {
             <label htmlFor="password" className={styles.label}>Password</label>
             <input id="password" name="password" type="password" required className={styles.input} />
           </div>
+
+          <div className={styles.inputGroup}>
+            <label htmlFor="charity" className={styles.label}>Support a Charity (Signup Only)</label>
+            <select id="charity" name="charity" className={styles.input} style={{ backgroundColor: 'var(--color-bg-base)' }}>
+              <option value="1">First Tee Foundation</option>
+              <option value="2">Make-A-Wish</option>
+              <option value="3">Local Youth Sports</option>
+              <option value="4">Ocean Conservancy</option>
+            </select>
+          </div>
           
           <div className={styles.actions}>
             <button formAction={login} className={styles.primaryBtn}>Log In</button>
