@@ -3,6 +3,8 @@ import { useState, useEffect } from 'react';
 import styles from '../page.module.css';
 import { fetchAllVerifications, updateVerificationStatus } from './actions';
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+
 export default function AdminVerificationsPage() {
   const [verifications, setVerifications] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -67,7 +69,7 @@ export default function AdminVerificationsPage() {
                   <td style={{ padding: '1rem' }}>{v.drawMonth}</td>
                   <td style={{ padding: '1rem' }}>
                     <button 
-                      onClick={() => setSelectedImage(`http://localhost:5000${v.proofImage}`)}
+                      onClick={() => setSelectedImage(`${API_BASE_URL}${v.proofImage}`)}
                       style={{ padding: '0.4rem 0.8rem', backgroundColor: 'var(--color-bg-base)', border: '1px solid var(--color-border)', borderRadius: '4px', cursor: 'pointer', color: 'var(--color-text-primary)' }}
                     >
                       View Image

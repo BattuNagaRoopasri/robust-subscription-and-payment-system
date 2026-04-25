@@ -10,6 +10,8 @@ interface SubscriptionData {
   expiresAt: string | null;
 }
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+
 export default function SubscribePage() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
@@ -28,7 +30,7 @@ export default function SubscribePage() {
         return;
       }
 
-      const res = await fetch('http://localhost:5000/api/subscription', {
+      const res = await fetch(`${API_BASE_URL}/api/subscription`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -55,7 +57,7 @@ export default function SubscribePage() {
 
     setProcessingPlan(plan);
     try {
-      const res = await fetch('http://localhost:5000/api/subscription/checkout', {
+      const res = await fetch(`${API_BASE_URL}/api/subscription/checkout`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -86,7 +88,7 @@ export default function SubscribePage() {
 
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:5000/api/subscription/cancel', {
+      const res = await fetch(`${API_BASE_URL}/api/subscription/cancel`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`
