@@ -4,6 +4,7 @@ const charitySchema = new mongoose.Schema({
   name: { type: String, required: true },
   category: { type: String, required: true },
   description: { type: String },
+  contribution: { type: Number, default: 0 },
   totalRaised: { type: Number, default: 0 },
   status: { type: String, enum: ['Active', 'Disabled'], default: 'Active' },
 }, { timestamps: true });
