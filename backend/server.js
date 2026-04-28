@@ -17,8 +17,6 @@ const Verification = require('./models/Verification');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// ================= MIDDLEWARE =================
-
 // CORS (IMPORTANT for deployment)
 app.use(cors({
   origin: [
@@ -30,7 +28,6 @@ app.use(cors({
 
 app.use(express.json({ limit: '10mb' }));
 
-// ================= FILE UPLOAD SETUP =================
 
 const uploadsDir = path.join(__dirname, 'uploads');
 
@@ -40,7 +37,6 @@ if (!fs.existsSync(uploadsDir)) {
 
 app.use('/uploads', express.static(uploadsDir));
 
-// ================= DATABASE =================
 
 if (process.env.MONGODB_URI) {
   mongoose.connect(process.env.MONGODB_URI)
