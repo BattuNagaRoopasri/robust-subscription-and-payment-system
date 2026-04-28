@@ -1,7 +1,18 @@
 import styles from './page.module.css';
 import { Target, Trophy, Heart, Calendar } from 'lucide-react';
 import { cookies } from 'next/headers';
-import jwtDecode from 'jwt-decode';
+
+function decodeJwt(token: string) {
+  try {
+    const parts = token.split('.');
+    if (parts.length < 2) return null;
+    const payload = parts[1];
+    const json = Buffer.from(payload, 'base64').toString('utf8');
+    return JSON.parse(json);
+  } catch (e) {
+    return null;
+  }
+}
 import { fetchScores } from './scores/actions';
 
 export default async function Dashboard() {
@@ -11,8 +22,8 @@ export default async function Dashboard() {
 
   if (tokenCookie && tokenCookie.value) {
     try {
-      const decoded: any = jwtDecode(tokenCookie.value);
-      username = decoded.username || 'Golfer';
+      const decoded: any = decodeJwt(tokenCookie.value);
+      username = decoded?.username || 'Golfer';
     } catch (e) {
       console.error('Failed to decode token');
     }

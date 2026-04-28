@@ -28,8 +28,11 @@ export default function LoginPage() {
 
     const payload: any = { email, password };
     if (isSignup) {
-      payload.username = String(fd.get('username') || email.split('@')[0]);
-      payload.selectedCharity = String(fd.get('charity') || '1');
+      const fullName = String(fd.get('fullName') || '');
+      payload.username = fullName ? fullName.split(' ')[0].toLowerCase() : email.split('@')[0];
+      payload.selectedCharity = String(fd.get('charity') || '');
+      payload.contributionPercentage = Number(fd.get('contribution') || 10);
+      payload.fullName = fullName;
     }
 
     const endpoint = isSignup ? '/api/auth/signup' : '/api/auth/login';
@@ -47,6 +50,21 @@ export default function LoginPage() {
         return;
       }
 
+      // store token in localStorage for client-side pages (subscribe)
+      if (data.token) {
+        try {
+          localStorage.setItem('token', data.token);
+          // decode username from token
+          const parts = data.token.split('.');
+          if (parts.length > 1) {
+            const payload = JSON.parse(atob(parts[1]));
+            if (payload.username) localStorage.setItem('username', payload.username);
+          }
+        } catch (e) {
+          // ignore
+        }
+      }
+
       // token cookie set by server route; navigate to dashboard
       router.push('/dashboard');
     } catch (err: any) {
@@ -59,14 +77,14 @@ export default function LoginPage() {
   return (
     <div className={styles.container}>
       <div className={styles.formWrapper}>
-        <h1 className={styles.title}>{isSignup ? 'Create Account' : 'Welcome Back'}</h1>
-        <p className={styles.subtitle}>{isSignup ? 'Fill the details to create your account.' : 'Sign in to your ImpactGolf account or create a new one.'}</p>
+        <h1 className={styles.title}>{isSignup ? 'Create your account' : 'Welcome Back'}</h1>
+        <p className={styles.subtitle}>{isSignup ? 'Join the platform and start supporting your chosen charity.' : 'Sign in to your ImpactGolf account or create a new one.'}</p>
         
         <form className={styles.form} onSubmit={handleSubmit}>
           {isSignup && (
             <div className={styles.inputGroup}>
-              <label htmlFor="username" className={styles.label}>Username</label>
-              <input id="username" name="username" type="text" required className={styles.input} />
+              <label htmlFor="fullName" className={styles.label}>Full Name</label>
+              <input id="fullName" name="fullName" type="text" placeholder="Your full name" required className={styles.input} />
             </div>
           )}
 
@@ -77,29 +95,33 @@ export default function LoginPage() {
           
           <div className={styles.inputGroup}>
             <label htmlFor="password" className={styles.label}>Password</label>
-            <input id="password" name="password" type="password" required className={styles.input} />
+            <input id="password" name="password" type="password" placeholder="Minimum 6 characters" minLength={6} required className={styles.input} />
           </div>
 
           {isSignup && (
             <div className={styles.inputGroup}>
               <label htmlFor="confirm" className={styles.label}>Confirm Password</label>
-              <input id="confirm" name="confirm" type="password" required className={styles.input} />
+              <input id="confirm" name="confirm" type="password" placeholder="Confirm password" required className={styles.input} />
             </div>
           )}
 
           <div className={styles.inputGroup}>
-            <label htmlFor="charity" className={styles.label}>Support a Charity (Signup Only)</label>
+            <label htmlFor="charity" className={styles.label}>Choose Charity (optional)</label>
             <select id="charity" name="charity" className={styles.input} style={{ backgroundColor: 'var(--color-bg-base)' }}>
+              <option value="">No charities available right now.</option>
               <option value="1">First Tee Foundation</option>
               <option value="2">Make-A-Wish</option>
               <option value="3">Local Youth Sports</option>
-              <option value="4">Ocean Conservancy</option>
-              <option value="5">Community Youth Golf Fund</option>
-              <option value="6">Clean Greens Initiative</option>
-              <option value="7">Women in Golf Network</option>
             </select>
           </div>
-          
+
+          {isSignup && (
+            <div className={styles.inputGroup}>
+              <label htmlFor="contribution" className={styles.label}>Contribution Percentage (min 10)</label>
+              <input id="contribution" name="contribution" type="number" min={10} defaultValue={10} className={styles.input} />
+            </div>
+          )}
+
           <div className={styles.actions}>
             {!isSignup ? (
               <>
@@ -108,7 +130,7 @@ export default function LoginPage() {
               </>
             ) : (
               <>
-                <button type="submit" className={styles.primaryBtn} disabled={loading}>{loading ? 'Working...' : 'Create Account'}</button>
+                <button type="submit" className={styles.primaryBtn} disabled={loading}>{loading ? 'Working...' : 'Signup'}</button>
                 <button type="button" onClick={() => setIsSignup(false)} className={styles.secondaryBtn}>Back to Login</button>
               </>
             )}

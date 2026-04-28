@@ -18,7 +18,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ status: 'error', message: data.message || 'Signup failed' }, { status: res.status });
     }
 
-    const response = NextResponse.json({ status: 'success' });
+    const response = NextResponse.json({ status: 'success', token: data.token });
     response.cookies.set('token', data.token, {
       httpOnly: true,
       sameSite: 'lax',

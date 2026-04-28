@@ -2,7 +2,18 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { cookies } from 'next/headers';
 import styles from './layout.module.css';
-import jwtDecode from "jwt-decode";
+
+function decodeJwt(token: string) {
+  try {
+    const parts = token.split('.');
+    if (parts.length < 2) return null;
+    const payload = parts[1];
+    const json = Buffer.from(payload, 'base64').toString('utf8');
+    return JSON.parse(json);
+  } catch (e) {
+    return null;
+  }
+}
 
 export default async function AdminLayout({
   children,
@@ -17,8 +28,8 @@ export default async function AdminLayout({
   }
 
   try {
-    const decoded: any = jwtDecode(token);
-    if (decoded.role !== 'admin') {
+    const decoded: any = decodeJwt(token as string);
+    if (!decoded || decoded.role !== 'admin') {
       redirect('/dashboard');
     }
   } catch (error) {

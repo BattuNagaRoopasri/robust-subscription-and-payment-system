@@ -71,6 +71,36 @@ const CHARITY_DIRECTORY = [
     event: 'Women\'s Open Charity Tournament - November 21, 2024',
     contribution: '15%'
   },
+  {
+    id: '8',
+    name: 'Disaster Relief Network',
+    category: 'Emergency',
+    desc: 'Offers emergency support, food, shelter, and rehabilitation during natural disasters like floods and earthquakes.',
+    fullDesc: 'Disaster Relief Network provides rapid-response emergency support including food, temporary shelter, medical assistance, and longer-term rehabilitation services for communities affected by natural disasters such as floods and earthquakes.',
+    image: 'https://loremflickr.com/800/600/disaster,relief,help/all',
+    event: 'Emergency Response Volunteer Drive',
+    contribution: '20%'
+  },
+  {
+    id: '9',
+    name: 'Senior Citizen Care',
+    category: 'Social',
+    desc: 'Supports elderly people by providing healthcare, companionship, and basic living necessities.',
+    fullDesc: 'Senior Citizen Care supports elderly individuals with healthcare services, companionship programs, and provision of basic living necessities to improve quality of life and reduce social isolation.',
+    image: 'https://loremflickr.com/800/600/senior,elderly,care/all',
+    event: 'Monthly Senior Wellness Check',
+    contribution: '10%'
+  },
+  {
+    id: '10',
+    name: 'Clean Water Mission',
+    category: 'Health',
+    desc: 'Provides access to safe and clean drinking water by installing water purification systems in villages.',
+    fullDesc: 'Clean Water Mission installs and maintains water purification systems and works with communities to ensure long-term access to safe water, reducing waterborne disease and improving public health outcomes.',
+    image: 'https://loremflickr.com/800/600/water,clean,well/all',
+    event: 'Water Filter Installation Initiative',
+    contribution: '10%'
+  },
 ];
 
 export default function CharitiesPage() {
