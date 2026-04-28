@@ -523,12 +523,10 @@ app.post('/api/subscription/cancel', authenticateToken, async (req, res) => {
     res.status(500).json({ status: 'error', message: error.message });
   }
 });
+const PORT = process.env.PORT || 5000;
 
-if (process.env.NODE_ENV !== 'production') {
-  app.listen(PORT, () => {
-    console.log(`Backend server running on http://localhost:${PORT}`);
-  });
-}
-
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
 // Export the app for Vercel serverless deployment
 module.exports = app;
