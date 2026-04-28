@@ -17,9 +17,7 @@ export default function Home() {
             <Link href="/subscribe" className={styles.primaryBtn}>
               Start Making an Impact
             </Link>
-            <Link href="/concept" className={styles.secondaryBtn}>
-              How it Works
-            </Link>
+              {/* How it Works removed */}
           </div>
         </div>
       </section>

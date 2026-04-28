@@ -16,7 +16,6 @@ export default function Footer() {
         
         <div className={styles.column}>
           <h4 className={styles.title}>Platform</h4>
-          <Link href="/concept" className={styles.link}>How it Works</Link>
           <Link href="/draws" className={styles.link}>Monthly Draws</Link>
           <Link href="/leaderboard" className={styles.link}>Leaderboard</Link>
         </div>
