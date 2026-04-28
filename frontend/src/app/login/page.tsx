@@ -1,12 +1,60 @@
 "use client";
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { login, signup } from './actions';
 import styles from './page.module.css';
 
 export default function LoginPage() {
   const [isSignup, setIsSignup] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setLoading(true);
+    const form = e.currentTarget as HTMLFormElement;
+    const fd = new FormData(form);
+    const email = String(fd.get('email') || '');
+    const password = String(fd.get('password') || '');
+    if (isSignup) {
+      const confirm = String(fd.get('confirm') || '');
+      if (password !== confirm) {
+        alert('Passwords do not match');
+        setLoading(false);
+        return;
+      }
+    }
+
+    const payload: any = { email, password };
+    if (isSignup) {
+      payload.username = String(fd.get('username') || email.split('@')[0]);
+      payload.selectedCharity = String(fd.get('charity') || '1');
+    }
+
+    const endpoint = isSignup ? '/api/auth/signup' : '/api/auth/login';
+    try {
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        alert(data.message || 'Authentication failed');
+        setLoading(false);
+        return;
+      }
+
+      // token cookie set by server route; navigate to dashboard
+      router.push('/dashboard');
+    } catch (err: any) {
+      alert(err.message || 'Network error');
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
     <div className={styles.container}>
@@ -14,7 +62,7 @@ export default function LoginPage() {
         <h1 className={styles.title}>{isSignup ? 'Create Account' : 'Welcome Back'}</h1>
         <p className={styles.subtitle}>{isSignup ? 'Fill the details to create your account.' : 'Sign in to your ImpactGolf account or create a new one.'}</p>
         
-        <form className={styles.form}>
+        <form className={styles.form} onSubmit={handleSubmit}>
           {isSignup && (
             <div className={styles.inputGroup}>
               <label htmlFor="username" className={styles.label}>Username</label>
@@ -55,12 +103,12 @@ export default function LoginPage() {
           <div className={styles.actions}>
             {!isSignup ? (
               <>
-                <button formAction={login} className={styles.primaryBtn}>Log In</button>
+                <button type="submit" className={styles.primaryBtn} disabled={loading}>{loading ? 'Working...' : 'Log In'}</button>
                 <button type="button" onClick={() => setIsSignup(true)} className={styles.secondaryBtn}>Sign Up</button>
               </>
             ) : (
               <>
-                <button formAction={signup} className={styles.primaryBtn}>Create Account</button>
+                <button type="submit" className={styles.primaryBtn} disabled={loading}>{loading ? 'Working...' : 'Create Account'}</button>
                 <button type="button" onClick={() => setIsSignup(false)} className={styles.secondaryBtn}>Back to Login</button>
               </>
             )}
