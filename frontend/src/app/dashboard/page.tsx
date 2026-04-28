@@ -1,7 +1,7 @@
 import styles from './page.module.css';
 import { Target, Trophy, Heart, Calendar } from 'lucide-react';
 import { cookies } from 'next/headers';
-import { jwtDecode } from 'jwt-decode';
+import jwtDecode from 'jwt-decode';
 import { fetchScores } from './scores/actions';
 
 export default async function Dashboard() {

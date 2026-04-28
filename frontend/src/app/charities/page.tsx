@@ -41,6 +41,36 @@ const CHARITY_DIRECTORY = [
     image: 'https://loremflickr.com/800/600/ocean,cleanup/all',
     event: 'Coastal Cleanup Day - September 20, 2024'
   },
+  {
+    id: '5',
+    name: 'Community Youth Golf Fund',
+    category: 'Youth',
+    desc: 'Support junior training and equipment access.',
+    fullDesc: 'The Community Youth Golf Fund supports junior training programs and provides equipment so that young players from underserved communities can access coaching, gear, and safe practice facilities.',
+    image: 'https://loremflickr.com/800/600/golf,children/all',
+    event: 'Junior Coaching Week - August 12, 2024',
+    contribution: '10%'
+  },
+  {
+    id: '6',
+    name: 'Clean Greens Initiative',
+    category: 'Environment',
+    desc: 'Drive sustainability and green course programs.',
+    fullDesc: 'Clean Greens Initiative partners with golf courses to implement sustainable practices — water conservation, native planting, and reduced chemical use — preserving habitats while keeping courses playable.',
+    image: 'https://loremflickr.com/800/600/green,course/all',
+    event: 'Sustainability Workshop - October 3, 2024',
+    contribution: '12%'
+  },
+  {
+    id: '7',
+    name: 'Women in Golf Network',
+    category: 'Community',
+    desc: 'Mentorship and tournaments for women players.',
+    fullDesc: 'Women in Golf Network provides mentorship programs, competitive opportunities, and community support to help more women discover and grow in the sport at all levels.',
+    image: 'https://loremflickr.com/800/600/women,golf/all',
+    event: 'Women\'s Open Charity Tournament - November 21, 2024',
+    contribution: '15%'
+  },
 ];
 
 export default function CharitiesPage() {
@@ -98,6 +128,9 @@ export default function CharitiesPage() {
                 <span className={styles.categoryTag}>{charity.category}</span>
                 <h2 className={styles.cardTitle}>{charity.name}</h2>
                 <p className={styles.cardDesc}>{charity.desc}</p>
+                {charity.contribution && (
+                  <p className={styles.contribution}>Contribution: {charity.contribution}</p>
+                )}
                 <div className={styles.cardActions}>
                   <button className={styles.primaryBtn} onClick={() => handleDonate(charity.name)}>Donate</button>
                   <button className={styles.secondaryBtn} onClick={() => setSelectedCharity(charity)}>Profile</button>
@@ -124,6 +157,9 @@ export default function CharitiesPage() {
               <span className={styles.categoryTag}>{selectedCharity.category}</span>
               <h2 className={styles.cardTitle} style={{ fontSize: '2rem', marginTop: '0.5rem' }}>{selectedCharity.name}</h2>
               <p className={styles.cardDesc} style={{ fontSize: '1.1rem', color: 'var(--color-text-primary)' }}>{selectedCharity.fullDesc}</p>
+              {selectedCharity.contribution && (
+                <p style={{ marginTop: '0.75rem', fontWeight: 600 }}>Contribution: {selectedCharity.contribution}</p>
+              )}
               
               <div className={styles.eventSection}>
                 <h3 className={styles.eventTitle}>Upcoming Event</h3>

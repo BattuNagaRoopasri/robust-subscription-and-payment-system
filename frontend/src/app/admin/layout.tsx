@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { cookies } from 'next/headers';
 import styles from './layout.module.css';
-import { jwtDecode } from "jwt-decode";
+import jwtDecode from "jwt-decode";
 
 export default async function AdminLayout({
   children,
