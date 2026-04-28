@@ -46,7 +46,6 @@ if (process.env.MONGODB_URI) {
   console.warn('⚠️ MONGODB_URI not set');
 }
 
-// ================= BASIC ROUTES =================
 
 app.get('/', (req, res) => {
   res.send('🚀 Backend API is running!');
@@ -56,7 +55,6 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', message: 'Backend is running' });
 });
 
-// ================= AUTH MIDDLEWARE =================
 
 function authenticateToken(req, res, next) {
   const token = req.headers['authorization']?.split(' ')[1];
